@@ -18,10 +18,10 @@ import org.eclipse.microprofile.jwt.JsonWebToken
 
 @Path("/secured")
 @RequestScoped
-class SecuredResource {
+class SecuredResource(private val jwt: JsonWebToken, private val ctx: SecurityContext) {
 
-    @Inject
-    var jwt: JsonWebToken? = null
+//    @Inject
+//    var jwt: JsonWebToken? = null
 
     @Inject
     @Claim(standard = Claims.birthdate)
@@ -31,7 +31,7 @@ class SecuredResource {
     @Path("permit-all")
     @PermitAll
     @Produces(MediaType.TEXT_PLAIN)
-    fun hello(@Context ctx: SecurityContext): String? {
+    fun hello(): String? {
         return getResponseString(ctx)
     }
 
@@ -39,7 +39,7 @@ class SecuredResource {
     @Path("roles-allowed")
     @RolesAllowed("User", "Admin")
     @Produces(MediaType.TEXT_PLAIN)
-    fun helloRolesAllowed(@Context ctx: SecurityContext): String? {
+    fun helloRolesAllowed(): String? {
         return getResponseString(ctx) + ", birthdate: " + jwt!!.getClaim<Any>("birthdate").toString()
     }
 
@@ -47,7 +47,7 @@ class SecuredResource {
     @Path("roles-allowed-admin")
     @RolesAllowed("Admin")
     @Produces(MediaType.TEXT_PLAIN)
-    fun helloRolesAllowedAdmin(@Context ctx: SecurityContext): String? {
+    fun helloRolesAllowedAdmin(): String? {
         return getResponseString(ctx) + ", birthdate: " + birthdate
     }
 
@@ -55,7 +55,7 @@ class SecuredResource {
     @Path("deny-all")
     @DenyAll
     @Produces(MediaType.TEXT_PLAIN)
-    fun helloShouldDeny(@Context ctx: SecurityContext?): String? {
+    fun helloShouldDeny(): String? {
         throw InternalServerErrorException("This method must not be invoked")
     }
 
